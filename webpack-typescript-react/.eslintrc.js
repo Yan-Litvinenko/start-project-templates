@@ -1,33 +1,34 @@
 module.exports = {
+    parser: '@typescript-eslint/parser',
+    plugins: ['@typescript-eslint', 'prettier', 'import', 'react'],
+    extends: ['airbnb-typescript', 'plugin:prettier/recommended'],
     env: {
         browser: true,
         es2021: true,
         node: true,
     },
-    parser: '@typescript-eslint/parser', // для анализа кода typescript
     parserOptions: {
-        project: './tsconfig.json', // путь к файлу tsconfig.json
+        project: './tsconfig.json',
+        ecmaFeatures: {
+            jsx: true,
+        },
     },
-    plugins: ["@typescript-eslint", "react"],
-    extends: [
-        "eslint:recommended",
-        "plugin:@typescript-eslint/recommended",
-        'plugin:prettier/recommended',
-        "plugin:react/recommended",
-    ],
     rules: {
-        indent: ['error', 4], // Использование пробелов для отступов
-        quotes: ['error', 'single'], // Одинарные кавычки для строк
-        semi: ['error', 'always'], // Всегда ставить точку с запятой в конце выражения
-        'prettier/prettier': 'error',
-        'comma-spacing': ['error', { before: false, after: true }], // Пробел после запятой, но не перед
-        'object-curly-spacing': ['error', 'always'], // Пробелы внутри фигурных скобок
-        'comma-dangle': ['error', 'always-multiline'], // Запятая в последней строке объектов и массивов в многострочных выражениях
-        'no-console': 'off', // Разрешить использование console.log
-    },
-    settings: {
-        react: {
-            version: "detect"
-        }
+        'no-use-before-define': 'off',
+        '@typescript-eslint/no-use-before-define': ['error', { functions: false }],
+        'no-debugger': 'off',
+        'no-console': 'off',
+        'class-methods-use-this': 'off',
+        'newline-per-chained-call': 'error',
+        'comma-spacing': ['error', { before: false, after: true }],
+        'object-curly-spacing': ['error', 'always'],
+        'comma-dangle': ['error', 'always-multiline'],
+        'lines-between-class-members': ['error', 'always', { exceptAfterSingleLine: true }],
+        'prettier/prettier': [
+            'error',
+            {
+                endOfLine: 'auto',
+            },
+        ],
     },
 };
