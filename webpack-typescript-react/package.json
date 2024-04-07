@@ -9,7 +9,8 @@
         "start": "cross-env NODE_ENV=development webpack serve --mode development --open",
         "lint": "eslint src --ext .ts --ext .tsx",
         "lint:fix": "eslint --fix ./src",
-        "format": "prettier --write ."
+        "format": "prettier --write .",
+        "prepare": "husky"
     },
     "browserslist": [
         "last 2 versions",
@@ -53,6 +54,7 @@
         "@types/react-dom": "^18.2.23",
         "react": "^18.2.0",
         "react-dom": "^18.2.0",
-        "reset-css": "^5.0.2"
+        "reset-css": "^5.0.2",
+        "uuidv4": "^9.0.1"
     }
 }

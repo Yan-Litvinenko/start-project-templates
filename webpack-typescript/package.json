@@ -9,7 +9,8 @@
     "start": "cross-env NODE_ENV=development webpack serve --mode development --open",
     "lint": "eslint src --ext .ts",
     "lint:fix": "eslint --fix ./src",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "prepare": "husky"
   },
   "browserslist": [
     "last 2 versions",
