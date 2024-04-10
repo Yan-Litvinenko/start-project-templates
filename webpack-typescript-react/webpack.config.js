@@ -19,7 +19,7 @@ module.exports = {
     plugins: addPlugins(),
     optimization: optimization(),
     resolve: {
-        extensions: ['.ts', '.tsx', '.js', '.jsx'],
+        extensions: ['js', '.ts', '.tsx', '.js', '.jsx'],
     },
     module: {
         rules: [

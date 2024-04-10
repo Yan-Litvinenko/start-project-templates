@@ -19,17 +19,36 @@ module.exports = {
     plugins: addPlugins(),
     optimization: optimization(),
     resolve: {
-        extensions: ['.ts'],
+        extensions: ['.ts', '.js'],
     },
     module: {
         rules: [
             {
                 test: /\.css$/,
-                use: [MiniCssExtractPlugin.loader, 'css-loader', 'postcss-loader'],
+                use: [
+                    MiniCssExtractPlugin.loader,
+                    {
+                        loader: 'css-loader',
+                        options: {
+                            modules: true,
+                        },
+                    },
+                    'postcss-loader',
+                ],
             },
             {
                 test: /\.s[ac]ss$/,
-                use: [MiniCssExtractPlugin.loader, 'css-loader', 'postcss-loader', 'sass-loader'],
+                use: [
+                    MiniCssExtractPlugin.loader,
+                    {
+                        loader: 'css-loader',
+                        options: {
+                            modules: true,
+                        },
+                    },
+                    'postcss-loader',
+                    'sass-loader',
+                ],
             },
             {
                 test: /\.(mp3|wav)$/i,
