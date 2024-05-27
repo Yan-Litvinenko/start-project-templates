@@ -1,98 +1,93 @@
-//откуда, куда, сторож, одновременные процессы, последовательное выполнение
-const { src, dest, watch, parallel, series } = require('gulp');             //возможности gulp
+const { src, dest, watch, parallel, series } = require('gulp');
+const browserSync = require('browser-sync').create();
+const concatFile = require('gulp-concat');
+const clean = require('gulp-clean');
+const htmlmin = require('gulp-htmlmin');
+const autoprefixer = require('gulp-autoprefixer');
+const sass = require('gulp-sass')(require('sass'));
+const compressCSS = require('gulp-clean-css');
+const compressJS = require('gulp-uglify-es').default;
+const babel = require('gulp-babel');
+const avif = require('gulp-avif');
+const webp = require('gulp-webp');
+const imagemin = require('gulp-imagemin');
+const newer = require('gulp-newer');
+const fonter = require('gulp-fonter');
+const ttf2woff2 = require('gulp-ttf2woff2');
 
-//подключаем модули для работы конвертации
-const sass = require('gulp-sass')(require('sass'));       //для конвертации из scss в css
-const concat = require('gulp-concat');                    //для объединения файлов или переименования
-const uglify = require('gulp-uglify-es').default;         //для сжатия js файлов
-const browserSync = require('browser-sync').create();     //для автоматического обновления страницы
-const autoprefixer = require('gulp-autoprefixer');        //для автопрефиксов css-стилей
-const clean = require('gulp-clean');                      //для очистки перед билдом
-const avif = require('gulp-avif');                        //для конвертации в avif
-const webp = require('gulp-webp');                        //для конвертации в webp
-const imagemin = require('gulp-imagemin');                //для конвертации в jpg/png
-const newer = require('gulp-newer');                      //для конвертации только новых файлов
-const fonter = require('gulp-fonter');                    //для конвертации шрифтов в woff(или другие)
-const ttf2woff2 = require('gulp-ttf2woff2');              //для конвертации любых шрифтов в woff2
+const html = () => {
+    return src('src/*.html')
+        .pipe(htmlmin({ collapseWhitespace: true }))
+        .pipe(dest('dist'));
+};
 
-
-function styles() {
-    return src('app/css/style.scss')                      //Какой файл конвертируем
-        .pipe(autoprefixer({ overrideBrowserlist: ['last 10 version'] }))
-        .pipe(concat('style.min.css'))                    //как будет называться файл
-        .pipe(sass({ outputStyle: 'compressed' }))        //тут уже поработала SASS константа + минифицируем
-        .pipe(dest('app/css'))                            //куда выкинуть обработанный файл
-        .pipe(browserSync.stream());                      //Обновляем страницу
-}
-
-function scripts() {
-    return src('app/js/index.js')
-        .pipe(concat('index.min.js'))
-        .pipe(uglify())
-        .pipe(dest('app/js'))
+const styles = () => {
+    return src(['src/css/*.scss', 'src/css/*.css'])
+        .pipe(sass().on('error', sass.logError))
+        .pipe(autoprefixer({ overrideBrowserslist: ['last 10 versions'], cascade: false }))
+        .pipe(compressCSS({ compatibility: 'ie8' }))
+        .pipe(concatFile('style.min.css'))
+        .pipe(dest('dist/css'))
         .pipe(browserSync.stream());
-}
+};
 
-function watching() {
+const scripts = () => {
+    return src(['src/js/index.js'])
+        .pipe(concatFile('index.min.js'))
+        .pipe(babel({ presets: ['@babel/env'] }))
+        .pipe(compressJS())
+        .pipe(dest('dist/js'))
+        .pipe(browserSync.stream());
+};
+
+const watching = () => {
     browserSync.init({
         server: {
-            baseDir: "app/"                                //директория для слежения
-        }
+            baseDir: 'dist/',
+        },
     });
-    watch(['app/css/*.scss'], styles)                  //Когда в папке произойдут изменения сработает функция
-    watch(['app/js/index.js'], scripts)
-    watch(['app/*.html']).on('change', browserSync.reload)
-    watch(['app/assets/images'], images)
-}
+    watch(['src/css/*.{css, scss}'], styles);
+    watch(['src/js/*.js'], scripts);
+    watch(['src/*.html']).on('change', browserSync.reload);
+    watch(['src/assets/images'], images);
+};
 
-function cleanDist() {
-    return src('dist')
-        .pipe(clean());
-}
+const cleanDir = () => {
+    return src(['dist/*']).pipe(clean());
+};
 
-function images(){
-    return src(['app/assets/images/*.*', '!app/assets/images/*.svg'])          //конвертируем все картинки кроме svg формата
-    .pipe(newer('app/assets/dist'))                                            //Для обхода дубликатов(кэш картинок)
-    .pipe(avif({quality: 50}))
+const images = () => {
+    return src(['src/assets/images/*.*', '!src/assets/images/*.svg'])
+        .pipe(newer('dist/assets/images'))
+        .pipe(avif({ quality: 50 }))
 
-    .pipe(src(['app/assets/images/*.*']))
-    .pipe(newer('app/assets/dist'))
-    .pipe(webp())
+        .pipe(src(['src/assets/images/*.*']))
+        .pipe(newer('dist/assets/images'))
+        .pipe(webp())
 
-    .pipe(src(['app/assets/images/*.*']))
-    .pipe(newer('app/assets/dist'))
-    .pipe(imagemin())
+        .pipe(src(['src/assets/images/*.*']))
+        .pipe(newer('dist/assets/images'))
+        .pipe(imagemin())
 
-    .pipe(dest('app/assets/dist'))
-}
+        .pipe(dest('dist/assets/images'));
+};
 
-function fonts(){
-    return src('app/fonts/*.*')
-    .pipe(fonter({
-        formats: ['woff', 'ttf']
-    }))
-    .pipe(src('app/fonts/*.ttf'))
-    .pipe(ttf2woff2())
-    .pipe(dest('app/fonts'))
-}
+const fonts = () => {
+    return src('src/fonts/*.*')
+        .pipe(fonter({ formats: ['woff'] }))
+        .pipe(dest('dist/fonts'))
+        .pipe(src('dist/fonts/*.woff'))
+        .pipe(ttf2woff2())
+        .pipe(dest('dist/fonts'));
+};
 
-function building() {                                       //что будем переносить в чистовик из черновика
-    return src([
-        'app/css/style.min.css',                            
-        'app/js/index.min.js',
-        'app/assets/dist/*.*',                      
-        'app/fonts/*.*',  
-        'app/**/*.html'],{ base: 'app' })                   //сохранить структуру проекта
-        .pipe(dest('dist'))
-}
-
-//Для запуска функций
-exports.styles = styles;
-exports.scripts = scripts;
-exports.watching = watching;
-exports.images = images;
+exports.clean = cleanDir;
 exports.fonts = fonts;
+exports.html = html;
+exports.images = images;
+exports.scripts = scripts;
+exports.styles = styles;
+exports.watching = watching;
 
-//Порядок запуска
-exports.build = series(cleanDist, building);                               //билд проекта
-exports.default = parallel(styles, scripts,  watching);
+exports.build = series(cleanDir, html, styles, scripts, fonts, images);
+exports.default = parallel(html, styles, scripts, watching);
