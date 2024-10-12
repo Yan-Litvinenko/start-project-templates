@@ -21,12 +21,21 @@ const html = () => {
         .pipe(dest('dist'));
 };
 
+const root = () => {
+    return src(['src/*.*', '!src/*.html']).pipe(dest('dist'));
+};
+
 const styles = () => {
     return src(['src/css/*.scss', 'src/css/*.css'])
         .pipe(sass().on('error', sass.logError))
-        .pipe(autoprefixer({ overrideBrowserslist: ['last 10 versions'], cascade: false }))
+        .pipe(
+            autoprefixer({
+                overrideBrowserslist: ['last 10 versions'],
+                cascade: false,
+            }),
+        )
         .pipe(compressCSS({ compatibility: 'ie8' }))
-        .pipe(concatFile('style.min.css'))
+        .pipe(concatFile('index.min.css'))
         .pipe(dest('dist/css'))
         .pipe(browserSync.stream());
 };
@@ -46,10 +55,34 @@ const watching = () => {
             baseDir: 'dist/',
         },
     });
-    watch(['src/css/*.{css, scss}'], styles);
-    watch(['src/js/*.js'], scripts);
-    watch(['src/*.html']).on('change', browserSync.reload);
-    watch(['src/assets/images'], images);
+    watch(
+        ['src/css/*.{css,scss}', 'src/css/*/*.{css,scss}'],
+        series(styles, (done) => {
+            browserSync.reload();
+            done();
+        }),
+    );
+    watch(
+        ['src/js/*.js'],
+        series(scripts, (done) => {
+            browserSync.reload();
+            done();
+        }),
+    );
+    watch(
+        ['src/*.html'],
+        series(html, (done) => {
+            browserSync.reload();
+            done();
+        }),
+    );
+    watch(
+        ['src/assets/img'],
+        series(images, (done) => {
+            browserSync.reload();
+            done();
+        }),
+    );
 };
 
 const cleanDir = () => {
@@ -57,26 +90,30 @@ const cleanDir = () => {
 };
 
 const images = () => {
-    return src(['src/assets/images/*.*', '!src/assets/images/*.svg'])
+    return src(['src/assets/img/*.*', '!src/assets/img/*.svg'])
         .pipe(newer('dist/assets/images'))
         .pipe(avif({ quality: 50 }))
 
         .pipe(src(['src/assets/images/*.*']))
-        .pipe(newer('dist/assets/images'))
+        .pipe(newer('dist/assets/img'))
         .pipe(webp())
 
         .pipe(src(['src/assets/images/*.*']))
-        .pipe(newer('dist/assets/images'))
+        .pipe(newer('dist/assets/img'))
         .pipe(imagemin())
 
-        .pipe(dest('dist/assets/images'));
+        .pipe(dest('dist/assets/img'));
+};
+
+const svg = () => {
+    return src('src/assets/img/*.svg').pipe(dest('dist/assets/img'));
 };
 
 const fonts = () => {
-    return src('src/fonts/*.*')
+    return src('src/fonts/*.{ttf,otf}')
         .pipe(fonter({ formats: ['woff'] }))
         .pipe(dest('dist/fonts'))
-        .pipe(src('dist/fonts/*.woff'))
+        .pipe(src('src/fonts/*.{ttf,otf}'))
         .pipe(ttf2woff2())
         .pipe(dest('dist/fonts'));
 };
@@ -84,10 +121,12 @@ const fonts = () => {
 exports.clean = cleanDir;
 exports.fonts = fonts;
 exports.html = html;
+exports.root = root;
 exports.images = images;
 exports.scripts = scripts;
 exports.styles = styles;
 exports.watching = watching;
+exports.svg = svg;
 
-exports.build = series(cleanDir, html, styles, scripts, fonts, images);
+exports.build = series(cleanDir, html, root, styles, scripts, fonts, images, svg);
 exports.default = parallel(html, styles, scripts, watching);

@@ -21,11 +21,6 @@ module.exports = {
         'object-curly-spacing': ['error', 'always'],
         'comma-dangle': ['error', 'always-multiline'],
         'lines-between-class-members': ['error', 'always', { exceptAfterSingleLine: true }],
-        'prettier/prettier': [
-            'error',
-            {
-                endOfLine: 'auto',
-            },
-        ],
+        'prettier/prettier': 'error',
     },
 };

@@ -1,16 +1,19 @@
 const path = require('path');
+const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const TerserWebpackPlugin = require('terser-webpack-plugin');
 const CssMinimizerWebpackPlugin = require('css-minimizer-webpack-plugin');
 const ESLintPlugin = require('eslint-webpack-plugin');
+const DotenvWebpackPlugin = require('dotenv-webpack');
+// const FaviconsWebpackPlugin = require('favicons-webpack-plugin');
 
 const isDev = process.env.NODE_ENV === 'development';
 const isProd = !isDev;
 
 module.exports = {
-    entry: path.resolve(__dirname, './src/index.ts'),
+    entry: path.resolve(__dirname, './src/ts/index.ts'),
     mode: 'development',
     output: {
         filename: '[name].[contenthash].js',
@@ -91,8 +94,28 @@ function addPlugins() {
             template: path.resolve(__dirname, './src/index.html'),
             filename: 'index.html',
         }),
+                // new FaviconsWebpackPlugin({
+        //     logo: './src/assets/images/favicon.png',
+        //     cache: true,
+        //     inject: true,
+        //     favicons: {
+        //         background: '#000',
+        //         icons: {
+        //             android: true,
+        //             appleIcon: true,
+        //             favicons: true,
+        //             windows: false,
+        //             yandex: false,
+        //             firefox: false,
+        //             coast: false,
+        //             appleStartup: false,
+        //         },
+        //     },
+        // }),
         new CleanWebpackPlugin(),
         new MiniCssExtractPlugin({ filename: '[name].[contenthash].css' }),
+        new DotenvWebpackPlugin(),
+        new webpack.HotModuleReplacementPlugin(),
     ];
 
     if (isDev) {

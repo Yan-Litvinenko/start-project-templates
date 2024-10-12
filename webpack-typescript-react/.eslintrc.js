@@ -1,6 +1,6 @@
 module.exports = {
     parser: '@typescript-eslint/parser',
-    plugins: ['@typescript-eslint', 'prettier', 'import', 'react'],
+    plugins: ['@typescript-eslint', 'prettier', 'import', 'react', 'react-compiler'],
     extends: ['airbnb-typescript', 'plugin:prettier/recommended'],
     env: {
         browser: true,
@@ -14,6 +14,14 @@ module.exports = {
         },
     },
     rules: {
+        '@typescript-eslint/naming-convention': [
+            'error',
+            {
+                selector: 'variable',
+                modifiers: ['const'],
+                format: ['camelCase', 'UPPER_CASE', 'PascalCase'],
+            },
+        ],
         'no-use-before-define': 'off',
         '@typescript-eslint/no-use-before-define': ['error', { functions: false }],
         'no-debugger': 'off',
@@ -24,11 +32,6 @@ module.exports = {
         'object-curly-spacing': ['error', 'always'],
         'comma-dangle': ['error', 'always-multiline'],
         'lines-between-class-members': ['error', 'always', { exceptAfterSingleLine: true }],
-        'prettier/prettier': [
-            'error',
-            {
-                endOfLine: 'auto',
-            },
-        ],
+        'prettier/prettier': 'error'
     },
 };

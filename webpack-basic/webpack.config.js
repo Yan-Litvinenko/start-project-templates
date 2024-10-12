@@ -1,26 +1,42 @@
 const path = require('path');
-const HtmlWebpackPlugin = require('html-webpack-plugin'); //* автоматически генерирует HTML-файл на основе шаблона, вставляет туда ссылки на файлы
-const MiniCssExtractPlugin = require('mini-css-extract-plugin'); //* css собирает css в отдельный файл
-const { CleanWebpackPlugin } = require('clean-webpack-plugin'); //* очистка перед сборкой
+const webpack = require('webpack');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const TerserWebpackPlugin = require('terser-webpack-plugin');
-const CssMinimizerWebpackPlugin = require('css-minimizer-webpack-plugin'); //* минификация
-const ESLintPlugin = require('eslint-webpack-plugin'); //* вебпак прогонял всё через eslint
+const CssMinimizerWebpackPlugin = require('css-minimizer-webpack-plugin');
+const ESLintPlugin = require('eslint-webpack-plugin');
+const DotenvWebpackPlugin = require('dotenv-webpack');
+// const FaviconsWebpackPlugin = require('favicons-webpack-plugin');
 
 const isDev = process.env.NODE_ENV === 'development';
 const isProd = !isDev;
 
 module.exports = {
-    entry: path.resolve(__dirname, './src/index.js'),
+    entry: path.resolve(__dirname, './src/js/index.js'),
     mode: 'development',
     output: {
-        filename: '[name].[contenthash].js', //* Имя выходного файла сборки
-        path: path.resolve(__dirname, './dist'), //* Путь для выходного файла сборки
-    },
-    resolve: {
-        extensions: ['.js'],
+        filename: '[name].[contenthash].js',
+        path: path.resolve(__dirname, './dist'),
+        publicPath: '/',
     },
     plugins: addPlugins(),
     optimization: optimization(),
+    resolve: {
+        extensions: ['.js'],
+        fallback: {
+            util: false,
+        },
+    },
+    devServer: {
+        static: {
+            directory: path.resolve(__dirname, 'dist'),
+        },
+        port: 8080,
+        open: true,
+        hot: true,
+        historyApiFallback: true,
+    },
     module: {
         rules: [
             {
@@ -30,7 +46,10 @@ module.exports = {
                     {
                         loader: 'css-loader',
                         options: {
-                            modules: true,
+                            modules: {
+                                localIdentName:
+                                    '[name]__[local]___[hash:base64:5]',
+                            },
                         },
                     },
                     'postcss-loader',
@@ -43,7 +62,10 @@ module.exports = {
                     {
                         loader: 'css-loader',
                         options: {
-                            modules: true,
+                            modules: {
+                                localIdentName:
+                                    '[name]__[local]--[hash:base64:5]',
+                            },
                         },
                     },
                     'postcss-loader',
@@ -51,7 +73,7 @@ module.exports = {
                 ],
             },
             {
-                test: /\.(mp3|wav)$/i,
+                test: /\.(mp3|wav|ogg)$/i,
                 type: 'asset/resource',
             },
             {
@@ -59,40 +81,30 @@ module.exports = {
                 type: 'asset/resource',
             },
             {
-                test: /\.(png|jpg|jpeg|svg$)/,
+                test: /\.(png|jpg|jpeg|svg|avif|webp|ico$)/,
                 type: 'asset/resource',
             },
-            jsRules(),
+            {
+                test: /\.(ts|tsx)$/,
+                use: 'ts-loader',
+                exclude: /node_modules/,
+            },
         ],
     },
 };
 
-function jsRules() {
-    const config = {
-        test: /\.js$/,
-        exclude: /node_modules/,
-    };
-
-    if (isProd) {
-        config.use = {
-            loader: 'babel-loader',
-        };
-    }
-
-    return config;
-}
-
 function optimization() {
     const config = {
         splitChunks: {
-            //* избежание дублирования кода
             chunks: 'all',
         },
     };
 
     if (isProd) {
-        //* Добавляем минификацию в продакшене
-        config.minimizer = [new TerserWebpackPlugin(), new CssMinimizerWebpackPlugin()];
+        config.minimizer = [
+            new TerserWebpackPlugin(),
+            new CssMinimizerWebpackPlugin(),
+        ];
     }
 
     return config;
@@ -104,8 +116,28 @@ function addPlugins() {
             template: path.resolve(__dirname, './src/index.html'),
             filename: 'index.html',
         }),
+        // new FaviconsWebpackPlugin({
+        //     logo: './src/assets/images/favicon.png',
+        //     cache: true,
+        //     inject: true,
+        //     favicons: {
+        //         background: '#000',
+        //         icons: {
+        //             android: true,
+        //             appleIcon: true,
+        //             favicons: true,
+        //             windows: false,
+        //             yandex: false,
+        //             firefox: false,
+        //             coast: false,
+        //             appleStartup: false,
+        //         },
+        //     },
+        // }),
         new CleanWebpackPlugin(),
         new MiniCssExtractPlugin({ filename: '[name].[contenthash].css' }),
+        new DotenvWebpackPlugin(),
+        new webpack.HotModuleReplacementPlugin(),
     ];
 
     if (isDev) {

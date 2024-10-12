@@ -1,10 +1,10 @@
 const path = require('path');
-const HtmlWebpackPlugin = require('html-webpack-plugin'); // автоматически генерирует HTML-файл на основе шаблона, вставляет туда ссылки на файлы
-const MiniCssExtractPlugin = require('mini-css-extract-plugin'); // css собирает css в отдельный файл
-const { CleanWebpackPlugin } = require('clean-webpack-plugin'); // очистка перед сборкой
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const TerserWebpackPlugin = require('terser-webpack-plugin');
-const CssMinimizerWebpackPlugin = require('css-minimizer-webpack-plugin'); // минификация
-const ESLintPlugin = require('eslint-webpack-plugin'); // вебпак прогонял всё через eslint
+const CssMinimizerWebpackPlugin = require('css-minimizer-webpack-plugin');
+const ESLintPlugin = require('eslint-webpack-plugin');
 
 const isDev = process.env.NODE_ENV === 'development';
 const isProd = !isDev;
@@ -13,13 +13,13 @@ module.exports = {
     entry: path.resolve(__dirname, './src/index.tsx'),
     mode: 'development',
     output: {
-        filename: '[name].[contenthash].js', // Имя выходного файла сборки
-        path: path.resolve(__dirname, './dist'), // Путь для выходного файла сборки
+        filename: '[name].[contenthash].js',
+        path: path.resolve(__dirname, './dist'),
     },
     plugins: addPlugins(),
     optimization: optimization(),
     resolve: {
-        extensions: ['js', '.ts', '.tsx', '.js', '.jsx'],
+        extensions: ['.js', '.jsx', '.ts', '.tsx'],
     },
     module: {
         rules: [
@@ -45,7 +45,7 @@ module.exports = {
             },
             {
                 test: /\.(ts|tsx)$/,
-                use: 'ts-lodaer',
+                use: 'ts-loader',
                 exclude: /node_modules/,
             },
         ],
@@ -55,13 +55,11 @@ module.exports = {
 function optimization() {
     const config = {
         splitChunks: {
-            // избежание дублирования кода
             chunks: 'all',
         },
     };
 
     if (isProd) {
-        // Добавляем минификацию в продакшене
         config.minimizer = [new TerserWebpackPlugin(), new CssMinimizerWebpackPlugin()];
     }
 
