@@ -15,12 +15,6 @@
         "resolveJsonModule": true,
         "skipLibCheck": true,
         "strict": true,
-        "target": "es5",
-        "baseUrl": ".",
-        "paths": {
-            "@/*": ["src/*"]
-        }
-    },
-    "include": ["src/**/*", ".eslintrc.cjs", ".prettierrc", "postcss.config.cjs"],
-    "exclude": ["node_modules", "**/*.spec.ts"]
+        "target": "es5"
+    }
 }

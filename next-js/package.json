@@ -1,42 +1,53 @@
 {
-    "name": "pixelpulse",
+    "name": "decor-market",
     "version": "0.1.0",
     "private": true,
     "scripts": {
-        "dev": "next dev",
+        "dev": "next dev -p 8081",
+        "start": "next start -p 8081",
         "build": "next build",
-        "start": "next start",
         "lint-staged": "lint-staged",
         "lint": "next lint",
+        "format": "prettier --write .",
         "prepare": "husky"
     },
     "lint-staged": {
         "*.{ts,tsx}": [
-            "eslint --fix",
-            "prettier --write"
+            "prettier --write",
+            "eslint --fix"
         ]
     },
     "dependencies": {
-        "@reduxjs/toolkit": "^2.2.7",
-        "next": "14.2.11",
-        "react": "^18",
-        "react-dom": "^18",
-        "react-hook-form": "^7.53.0",
-        "react-loader-spinner": "^6.1.6",
+        "@reduxjs/toolkit": "^2.3.0",
+        "axios": "^1.7.9",
+        "dotenv": "^16.4.7",
+        "next": "15.0.3",
+        "react": "19.0.0-rc-66855b96-20241106",
+        "react-dom": "19.0.0-rc-66855b96-20241106",
         "react-redux": "^9.1.2",
         "reset-css": "^5.0.2",
-        "sass": "^1.79.2"
+        "sass": "~1.69.7"
     },
     "devDependencies": {
-        "@types/node": "^20",
         "@types/react": "^18",
         "@types/react-dom": "^18",
+        "@typescript-eslint/eslint-plugin": "^7.18.0",
+        "@typescript-eslint/parser": "^7.18.0",
         "eslint": "^8",
+        "eslint-config-airbnb": "^19.0.4",
         "eslint-config-airbnb-typescript": "^18.0.0",
-        "eslint-config-next": "14.2.11",
+        "eslint-config-next": "15.0.3",
+        "eslint-config-prettier": "9.1.0",
+        "eslint-plugin-import": "^2.31.0",
+        "eslint-plugin-jsx-a11y": "^6.10.2",
+        "eslint-plugin-prettier": "5.2.1",
+        "eslint-plugin-react": "^7.37.2",
+        "eslint-plugin-react-hooks": "^5.0.0",
         "husky": "^9.1.6",
         "lint-staged": "^15.2.10",
-        "prettier": "^3.3.3",
-        "typescript": "^5"
+        "postcss-preset-env": "^10.1.0",
+        "prettier": "3.3.3",
+        "tsx": "^4.19.2",
+        "typescript": "^5.7.2"
     }
 }

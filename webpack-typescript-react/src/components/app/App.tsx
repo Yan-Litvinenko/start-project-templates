@@ -1,8 +1,12 @@
 import React from 'react';
-import styles from './App.module.css';
 
-function App() {
-    return <></>;
+export default function App(): React.JSX.Element {
+    const test = 1;
+
+    console.log(test);
+    if (test === 1) {
+        return <>React App Started</>;
+    }
+
+    return <>React App Started</>;
 }
-
-export { App };

@@ -97,7 +97,9 @@ const config = {
                         options: {
                             modules: {
                                 auto: true,
-                                localIdentName: isDev ? '[name]__[local]--[hash:base64:5]' : '[hash:base64:8]',
+                                localIdentName: isDev
+                                    ? '[name]__[local]--[hash:base64:5]'
+                                    : '[hash:base64:8]',
                             },
                             sourceMap: isDev,
                         },

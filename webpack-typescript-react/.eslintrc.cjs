@@ -1,14 +1,24 @@
 module.exports = {
     parser: '@typescript-eslint/parser',
-    plugins: ['@typescript-eslint', 'prettier', 'import'],
-    extends: ['airbnb-typescript/base', 'plugin:prettier/recommended', 'prettier'],
-    env: {
-        browser: true,
-        es2021: true,
-        node: true,
-    },
     parserOptions: {
-        project: './tsconfig.json',
+        project: 'tsconfig.json',
+        tsconfigRootDir: '.',
+        sourceType: 'module',
+    },
+    plugins: ['@typescript-eslint', 'react', 'react-hooks', 'prettier'],
+    extends: [
+        'airbnb',
+        'airbnb-typescript',
+        'airbnb/hooks',
+        'plugin:@typescript-eslint/recommended',
+        'plugin:prettier/recommended',
+        'prettier',
+    ],
+    root: true,
+    env: {
+        node: true,
+        browser: true,
+        jest: true,
     },
     rules: {
         '@typescript-eslint/explicit-function-return-type': 'warn',
@@ -18,6 +28,17 @@ module.exports = {
         '@typescript-eslint/consistent-type-imports': [
             'error',
             { prefer: 'type-imports', disallowTypeAnnotations: true },
+        ],
+
+        'react-hooks/exhaustive-deps': 'warn',
+        'react-hooks/rules-of-hooks': 'error',
+
+        'react/display-name': 'off',
+        'react/prop-types': 'off',
+        'react/require-default-props': 'off',
+        'react/function-component-definition': [
+            'error',
+            { namedComponents: 'function-declaration', unnamedComponents: 'arrow-function' },
         ],
 
         'import/prefer-default-export': 'off',
@@ -32,5 +53,10 @@ module.exports = {
         'no-console': 'off',
         'no-else-return': 'error',
         'no-useless-return': 'error',
+    },
+    settings: {
+        react: {
+            version: 'detect',
+        },
     },
 };
